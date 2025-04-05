@@ -1,0 +1,2 @@
+titlenew, textnre
+title, text
