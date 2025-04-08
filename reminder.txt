@@ -1,2 +1,0 @@
-titlenew, textnre
-title, text
