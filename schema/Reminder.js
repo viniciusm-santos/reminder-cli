@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 const Reminder = new Schema({
   title: String,
   description: String,
-  data: Date,
+  date: Date,
+  done: Boolean,
 });
 
 module.exports = Reminder;

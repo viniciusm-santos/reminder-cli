@@ -39,46 +39,35 @@ const generateId = () => {
 };
 
 const add = async () => {
-  const { adicionar, descricao } = values;
-  const newReminder = {
-    // id: generateId(),
-    title: adicionar,
-    description: descricao,
+  const data = {
+    title: values.adicionar,
+    description: values.descricao,
     date: new Date().toISOString(),
   };
 
-  //   let data = [];
-  //   if (fs.existsSync(fileName)) {
-  //     data = JSON.parse(fs.readFileSync(fileName, "utf-8"));
-  //   }
+  await repository.create(data);
 
-  //   data.push(newReminder);
-
-  //   fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
-
-  await repository.create(newReminder);
-
-  console.log(`Tarefa adicionada com ID: ${newReminder.id}`);
-  process.exit();
+  console.log(`✅ Tarefa adicionada: ${values.descricao}`);
 };
 
-const list = () => {
-  if (fs.existsSync(fileName)) {
-    const data = fs.readFileSync(fileName, "utf-8");
-    console.log(data);
-  } else {
-    console.log("Nenhuma tarefa registrada");
-  }
+const list = async () => {
+  console.log("📋 Lista de Tarefas:");
+  const reminders = await repository.list();
+  reminders.forEach((r) => {
+    console.log(
+      `${r.done ? "✓" : "◻"} ${r._id}: ${r.title} - ${r.description}`
+    );
+  });
 };
 
-const remove = () => {
-  const id = args[0];
-  if (fs.existsSync(fileName) && id) {
-    let data = JSON.parse(fs.readFileSync(fileName, "utf-8"));
-    let newData = data.filter((reminder) => reminder.id != id);
+const finishReminder = async () => {
+  const result = await repository.updateById(values.concluir, { done: true });
+  console.log(`🎉 Tarefa concluída: ${result.title}`);
+};
 
-    fs.writeFileSync(fileName, JSON.stringify(newData, null, 2));
-  }
+const remove = async () => {
+  const result = await repository.deleteById(values.remover);
+  console.log(`🗑️ Tarefa removida: ID ${values.remover}`);
 };
 
 let tarefas = [
@@ -89,33 +78,13 @@ let tarefas = [
 if (values.ajuda) {
   mostrarAjuda();
 } else if (values.adicionar) {
-  const novaTarefa = {
-    id: tarefas.length + 1,
-    descricao: values.adicionar,
-    concluida: false,
-  };
-  tarefas.push(novaTarefa);
-  console.log(`✅ Tarefa adicionada: ${novaTarefa.descricao}`);
   add();
 } else if (values.remover) {
-  const id = parseInt(values.remover);
-  tarefas = tarefas.filter((t) => t.id !== id);
-  console.log(`🗑️ Tarefa removida: ID ${id}`);
+  remove();
 } else if (values.concluir) {
-  const id = parseInt(values.concluir);
-  const tarefa = tarefas.find((t) => t.id === id);
-  if (tarefa) {
-    tarefa.concluida = true;
-    console.log(`🎉 Tarefa concluída: ${tarefa.descricao}`);
-  }
+  finishReminder();
 } else if (values.listar) {
-  console.log("📋 Lista de Tarefas:");
-  tarefas.forEach((t) => {
-    console.log(`${t.concluida ? "✓" : "◻"} ${t.id}: ${t.descricao}`);
-  });
-
-  repository.list().then((result) => console.log(result));
-  //   process.exit();
+  list();
 } else {
   mostrarAjuda();
 }
