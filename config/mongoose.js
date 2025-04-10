@@ -4,7 +4,18 @@ const config = require("config");
 
 const log = debug("reminder-pusher:config:mongoose");
 
-mongoose.connect(config.get("mongo.uri"));
-mongoose.connection.on("error", (err) => log("mongodb err", err));
+let isConnected = false;
 
-module.exports = mongoose;
+async function connectDB() {
+  if (isConnected) return;
+  await mongoose.connect(config.get("mongo.uri"));
+  isConnected = true;
+}
+
+async function disconnectDB() {
+  if (isConnected) {
+    await mongoose.disconnect();
+    isConnected = false;
+  }
+}
+module.exports = { connectDB, disconnectDB };

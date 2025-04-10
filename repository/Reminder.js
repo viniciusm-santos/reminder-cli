@@ -1,13 +1,9 @@
-const mongoose = require("../config/mongoose.js");
-const schema = require("../schema/Reminder.js");
-const model = mongoose.model("Reminder", schema);
+const model = require("../model/Reminder.js");
 
 const Reminder = {
   async list() {
     const query = {};
-    const result = await model.find(query);
-    mongoose.connection.close();
-    return result;
+    return await model.find(query);
   },
   byId(id) {
     return model.findOne({ _id: id });
@@ -17,14 +13,10 @@ const Reminder = {
     return reminder.save();
   },
   async updateById(id, data) {
-    const result = await model.updateOne({ _id: id }, data);
-    mongoose.connection.close();
-    return result;
+    return await model.updateOne({ _id: id }, data);
   },
   async deleteById(id) {
-    const result = await model.deleteOne({ _id: id });
-    mongoose.connection.close();
-    return result;
+    return await model.deleteOne({ _id: id });
   },
 };
 
