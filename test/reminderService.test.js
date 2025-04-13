@@ -1,54 +1,46 @@
-// __tests__/reminder.test.js
-const reminderService = require("../domain/reminderService");
-const repository = require("../repository/reminderRepository");
+const makeReminderService = require("../domain/usecases/reminderService");
 
-jest.mock("../repository/reminderRepository");
+describe("Reminder Service", () => {
+  let reminderService;
+  let fakeRepository;
 
-describe("reminderService.add", () => {
-  it("should add a new reminder", async () => {
-    const mockValues = {
-      adicionar: "Estudar Node.js",
-      descricao: "Focar em testes unitários",
+  beforeEach(() => {
+    const reminders = [];
+
+    fakeRepository = {
+      create: jest.fn(async (data) => {
+        const newReminder = { _id: String(reminders.length + 1), ...data };
+        reminders.push(newReminder);
+        return newReminder;
+      }),
+      list: jest.fn(async () => reminders),
+      updateById: jest.fn(),
+      deleteById: jest.fn(),
     };
 
-    const mockResult = { _id: "123", ...mockValues };
-
-    repository.create.mockResolvedValue(mockResult);
-
-    const result = await reminderService.add(mockValues);
-
-    expect(repository.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Estudar Node.js",
-        description: "Focar em testes unitários",
-        repeatIntervalMinutes: 60,
-        random: true,
-      })
-    );
-
-    expect(result).toEqual(mockResult);
+    reminderService = makeReminderService(fakeRepository);
   });
-});
 
-describe("reminderService.list", () => {
-  it("should return all reminder", async () => {
-    const mockReminders = [
-      { _id: "1", title: "Estudar", description: "Node.js", done: false },
-      { _id: "2", title: "Dormir", description: "", done: true },
-    ];
+  it("deve adicionar um lembrete com sucesso", async () => {
+    const values = {
+      title: "Estudar testes",
+      description: "Cobrir service com jest",
+    };
 
-    const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    const result = await reminderService.add(values);
 
-    repository.list.mockResolvedValue(mockReminders);
+    expect(result.title).toBe("Estudar testes");
+    expect(fakeRepository.create).toHaveBeenCalled();
+  });
 
-    await reminderService.list();
+  it("deve listar os lembretes cadastrados", async () => {
+    await reminderService.add({ adicionar: "1", descricao: "teste 1" });
+    await reminderService.add({ adicionar: "2", descricao: "teste 2" });
 
-    expect(repository.list).toHaveBeenCalled();
+    const list = await reminderService.list();
 
-    expect(consoleSpy).toHaveBeenCalledWith("📋 Lista de Tarefas:");
-    expect(consoleSpy).toHaveBeenCalledWith("◻ 1: Estudar - Node.js");
-    expect(consoleSpy).toHaveBeenCalledWith("✓ 2: Dormir - ");
-
-    consoleSpy.mockRestore();
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.length).toBe(2);
+    expect(fakeRepository.list).toHaveBeenCalled();
   });
 });

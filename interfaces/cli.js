@@ -3,7 +3,7 @@ const { parseArgs } = require("node:util");
 const { connectDB, disconnectDB } = require("../config/mongoose.js");
 const reminderModel = require("../infrastructure/db/mongoose/reminderModel.js");
 const reminderRepository = require("../infrastructure/db/mongoose/reminderRepository.js");
-const reminderService = require("../domain/reminderService.js");
+const reminderService = require("../domain/usecases/reminderService.js");
 
 async function main() {
   const { values } = parseArgs({
