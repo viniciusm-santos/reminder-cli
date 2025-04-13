@@ -1,5 +1,5 @@
 // __tests__/reminder.test.js
-const reminderService = require("../service/reminderService");
+const reminderService = require("../domain/reminderService");
 const repository = require("../repository/reminderRepository");
 
 jest.mock("../repository/reminderRepository");

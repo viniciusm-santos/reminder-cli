@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 const { parseArgs } = require("node:util");
 const { connectDB, disconnectDB } = require("../config/mongoose.js");
-const reminderService = require("../service/reminderService.js");
+const reminderModel = require("../infrastructure/db/mongoose/reminderModel.js");
+const reminderRepository = require("../infrastructure/db/mongoose/reminderRepository.js");
+const reminderService = require("../domain/reminderService.js");
 
 async function main() {
-  const { values, positionals } = parseArgs({
+  const { values } = parseArgs({
     options: {
       adicionar: {
         type: "string",
@@ -34,19 +36,32 @@ async function main() {
     allowPositionals: true,
   });
 
-  try {
-    await connectDB();
+  await connectDB();
+  const service = reminderService(reminderRepository(reminderModel));
 
+  try {
     if (values.ajuda) {
       mostrarAjuda();
     } else if (values.adicionar) {
-      await reminderService.add(values);
+      const result = await service.add({
+        title: values.adicionar,
+        description: values.descricao,
+      });
+      console.log(`✅ Tarefa adicionada: ${result.title}`);
     } else if (values.remover) {
-      await reminderService.remove(values);
+      await service.remove(values.remover);
+      console.log(`🗑️ Tarefa removida: ID ${values.remover}`);
     } else if (values.concluir) {
-      await reminderService.finishReminder(values);
+      await service.finishReminder(values.concluir);
+      console.log(`🎉 Tarefa concluída: ${values.concluir}`);
     } else if (values.listar) {
-      await reminderService.list();
+      console.log("📋 Lista de Tarefas:");
+      const result = await service.list();
+      result.forEach((r) => {
+        console.log(
+          `${r.done ? "✓" : "◻"} ${r._id}: ${r.title} - ${r.description || ""}`
+        );
+      });
     } else {
       mostrarAjuda();
     }

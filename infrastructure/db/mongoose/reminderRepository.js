@@ -1,6 +1,4 @@
-const model = require("../model/reminderModel.js");
-
-const Reminder = {
+const reminderRepository = (model) => ({
   async list() {
     const query = {};
     return await model.find(query);
@@ -18,6 +16,6 @@ const Reminder = {
   async deleteById(id) {
     return await model.deleteOne({ _id: id });
   },
-};
+});
 
-module.exports = Reminder;
+module.exports = reminderRepository;
