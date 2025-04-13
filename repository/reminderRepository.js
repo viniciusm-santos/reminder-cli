@@ -1,4 +1,4 @@
-const model = require("../model/Reminder.js");
+const model = require("../model/reminderModel.js");
 
 const Reminder = {
   async list() {

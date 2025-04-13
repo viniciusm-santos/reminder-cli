@@ -1,4 +1,4 @@
-const repository = require("../repository/Reminder.js");
+const repository = require("../repository/reminderRepository.js");
 
 const Reminder = {
   async add(values) {
@@ -6,11 +6,16 @@ const Reminder = {
       title: values.adicionar,
       description: values.descricao,
       date: new Date().toISOString(),
+      repeatIntervalMinutes: 60,
+      nextTriggerAt: 30,
+      random: true,
+      channels: ["whatsapp", "browser", 11],
     };
 
-    await repository.create(data);
+    const result = await repository.create(data);
 
-    console.log(`✅ Tarefa adicionada: ${values.descricao}`);
+    console.log(`✅ Tarefa adicionada: ${values.adicionar}`);
+    return result;
   },
 
   async list() {
@@ -18,7 +23,7 @@ const Reminder = {
     const reminders = await repository.list();
     reminders.forEach((r) => {
       console.log(
-        `${r.done ? "✓" : "◻"} ${r._id}: ${r.title} - ${r.description}`
+        `${r.done ? "✓" : "◻"} ${r._id}: ${r.title} - ${r.description || ""}`
       );
     });
   },

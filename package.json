@@ -7,7 +7,7 @@
     "reminder": "./bin/cli-parse.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,9 @@
     "config": "^3.3.12",
     "debug": "^4.4.0",
     "mongoose": "^8.13.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mocha": "^11.1.0"
   }
 }

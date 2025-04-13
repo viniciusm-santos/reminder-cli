@@ -8,6 +8,11 @@ const reminderSchema = new Schema({
   description: String,
   date: Date,
   done: Boolean,
+  repeatQuantity: Number,
+  repeatIntervalMinutes: Number,
+  nextTriggerAt: Number,
+  random: Boolean,
+  channels: [String],
 });
 
 module.exports = mongoose.model("Reminder", reminderSchema);

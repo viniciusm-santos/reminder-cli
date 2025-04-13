@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { parseArgs } = require("node:util");
 const { connectDB, disconnectDB } = require("../config/mongoose.js");
-const reminderService = require("../service/Reminder.js");
+const reminderService = require("../service/reminderService.js");
 
 async function main() {
   const { values, positionals } = parseArgs({
