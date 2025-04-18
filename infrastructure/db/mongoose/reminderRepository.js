@@ -18,4 +18,4 @@ const reminderRepository = (model) => ({
   },
 });
 
-module.exports = reminderRepository;
+export default reminderRepository;

@@ -1,6 +1,6 @@
-const debug = require("debug");
-const mongoose = require("mongoose");
-const config = require("config");
+import debug from "debug";
+import mongoose from "mongoose";
+import config from "config";
 
 const log = debug("reminder-pusher:config:mongoose");
 
@@ -18,4 +18,5 @@ async function disconnectDB() {
     isConnected = false;
   }
 }
-module.exports = { connectDB, disconnectDB };
+
+export { connectDB, disconnectDB };

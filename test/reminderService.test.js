@@ -1,4 +1,4 @@
-const makeReminderService = require("../domain/usecases/reminderService");
+import MakeReminderService from "../domain/usecases/ReminderService";
 
 describe("Reminder Service", () => {
   let reminderService;
@@ -18,7 +18,7 @@ describe("Reminder Service", () => {
       deleteById: jest.fn(),
     };
 
-    reminderService = makeReminderService(fakeRepository);
+    reminderService = new MakeReminderService(fakeRepository);
   });
 
   it("deve adicionar um lembrete com sucesso", async () => {

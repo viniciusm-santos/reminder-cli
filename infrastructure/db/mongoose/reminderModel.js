@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
@@ -14,4 +14,4 @@ const reminderSchema = new Schema({
   channels: [String],
 });
 
-module.exports = mongoose.model("Reminder", reminderSchema);
+export default mongoose.model("Reminder", reminderSchema);

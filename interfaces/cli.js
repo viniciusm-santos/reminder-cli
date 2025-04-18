@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-const { parseArgs } = require("node:util");
-const { connectDB, disconnectDB } = require("../config/mongoose.js");
-const reminderModel = require("../infrastructure/db/mongoose/reminderModel.js");
-const reminderRepository = require("../infrastructure/db/mongoose/reminderRepository.js");
-const reminderService = require("../domain/usecases/reminderService.js");
+import { parseArgs } from "node:util";
+import { connectDB, disconnectDB } from "../config/mongoose.js";
+import reminderModel from "../infrastructure/db/mongoose/reminderModel.js";
+import reminderRepository from "../infrastructure/db/mongoose/reminderRepository.js";
+import ReminderService from "../domain/usecases/ReminderService.js";
+import WhatsappNotificationStrategy from "../domain/strategies/concrete/WhatsappNotificationStrategy.js";
+import NotificationUseCase from "../domain/usecases/NotificationUseCase.js";
 
 async function main() {
   const { values } = parseArgs({
@@ -36,8 +38,14 @@ async function main() {
     allowPositionals: true,
   });
 
+  const whatsappNotificationStrategy = new WhatsappNotificationStrategy();
+  const notificatioUseCase = new NotificationUseCase(
+    whatsappNotificationStrategy
+  );
+  notificatioUseCase.execute();
+
   await connectDB();
-  const service = reminderService(reminderRepository(reminderModel));
+  const service = new ReminderService(reminderRepository(reminderModel));
 
   try {
     if (values.ajuda) {

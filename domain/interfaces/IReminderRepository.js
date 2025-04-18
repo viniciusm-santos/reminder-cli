@@ -39,4 +39,4 @@ class IReminderRepository {
   }
 }
 
-module.exports = IReminderRepository;
+// module.exports = IReminderRepository;
