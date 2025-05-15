@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { connectDB, disconnectDB } from "../config/mongoose.js";
-import reminderModel from "../infrastructure/db/mongoose/reminderModel.js";
-import reminderRepository from "../infrastructure/db/mongoose/reminderRepository.js";
-import ReminderService from "../domain/usecases/ReminderService.js";
-import WhatsappNotificationStrategy from "../domain/strategies/concrete/WhatsappNotificationStrategy.js";
-import NotificationUseCase from "../domain/usecases/NotificationUseCase.js";
+import Reminder from "./modules/reminders/models/Reminder.js";
+import ReminderRepository from "./modules/reminders/repositories/ReminderRepository.js";
+import ReminderService from "./modules/reminders/services/ReminderService.js";
+import CliController from "./modules/reminders/controllers/CliController.js";
 
 async function main() {
   const { values } = parseArgs({
@@ -38,34 +37,28 @@ async function main() {
     allowPositionals: true,
   });
 
-  const whatsappNotificationStrategy = new WhatsappNotificationStrategy();
-  const notificatioUseCase = new NotificationUseCase(
-    whatsappNotificationStrategy
-  );
-  notificatioUseCase.execute();
-
   await connectDB();
-  const service = new ReminderService(reminderRepository(reminderModel));
+  const repository = new ReminderRepository(Reminder);
+  const service = new ReminderService(repository);
+  const cliController = new CliController(service);
 
   try {
     if (values.ajuda) {
       mostrarAjuda();
     } else if (values.adicionar) {
-      const result = await service.add({
-        title: values.adicionar,
-        description: values.descricao,
-      });
-      console.log(`✅ Tarefa adicionada: ${result.title}`);
+      const reminder = await cliController.add(values);
+      console.log(
+        `✅ Tarefa adicionada (usando controller): ${reminder.title}`
+      );
     } else if (values.remover) {
-      await service.remove(values.remover);
-      console.log(`🗑️ Tarefa removida: ID ${values.remover}`);
+      await cliController.delete(values.remover);
+      console.log(`🗑️ Lembrete removido`);
     } else if (values.concluir) {
-      await service.finishReminder(values.concluir);
-      console.log(`🎉 Tarefa concluída: ${values.concluir}`);
+      await cliController.finish(values.concluir);
+      console.log(`🎉 Lembrete concluído`);
     } else if (values.listar) {
-      console.log("📋 Lista de Tarefas:");
-      const result = await service.list();
-      result.forEach((r) => {
+      const reminders = await cliController.list();
+      reminders.forEach((r) => {
         console.log(
           `${r.done ? "✓" : "◻"} ${r._id}: ${r.title} - ${r.description || ""}`
         );

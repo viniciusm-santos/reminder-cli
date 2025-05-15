@@ -14,4 +14,6 @@ const reminderSchema = new Schema({
   channels: [String],
 });
 
-export default mongoose.model("Reminder", reminderSchema);
+const Reminder = mongoose.model("Reminder", reminderSchema);
+
+export default Reminder;
